@@ -1,6 +1,8 @@
 public class BombSquare extends GameSquare {
+
     private GameBoard board; // Object reference to the GameBoard this square is part of.
-    private boolean hasBomb; // True if this squre contains a bomb. False otherwise.
+    private boolean hasBomb; // True if this square contains a bomb. False otherwise.
+    private int visitedCells[][] = new int[30][30]; // Detects which cells were checked.
 
     public static final int MINE_PROBABILITY = 10;
 
@@ -14,82 +16,67 @@ public class BombSquare extends GameSquare {
 
     @Override
     public void leftClicked() {
+
         if (this.hasBomb) {
             this.setImage("images/bomb.png");
             System.out.println("Game End");
         } else {
-            recursion(this.getXLocation(), this.getYLocation());
+
+            for (int i = 0; i < visitedCells.length; i++) {
+                for (int k = 0; k < visitedCells.length; k++) {
+                    this.visitedCells[i][k] = 0;
+                }
+            }
+
+            recursion(this);
+        }
+    }
+
+    public void recursion(GameSquare square) {
+        int bombCount = 0;
+
+        int x = square.getXLocation();
+        int y = square.getYLocation();
+        this.visitedCells[x][y] = 1;
+
+        GameSquare squares[] = new BombSquare[9];
+
+        squares[0] = this.board.getSquareAt(x, y);
+        squares[1] = this.board.getSquareAt(x - 1, y - 1);
+        squares[2] = this.board.getSquareAt(x - 1, y);
+        squares[3] = this.board.getSquareAt(x - 1, y + 1);
+        squares[4] = this.board.getSquareAt(x, y + 1);
+        squares[5] = this.board.getSquareAt(x, y - 1);
+        squares[6] = this.board.getSquareAt(x + 1, y - 1);
+        squares[7] = this.board.getSquareAt(x + 1, y);
+        squares[8] = this.board.getSquareAt(x + 1, y + 1);
+
+        for (int i = 0; i < squares.length; i++) {
+            if (squares[i] != null && ((BombSquare) squares[i]).getHasBomb()) {
+                bombCount++;
+            }
+        }
+
+        if (bombCount == 0) {
+            square.setImage("images/0.png");
+            for (int i = 0; i < squares.length; i++) {
+                if (squares[i] != null) {
+                    if (this.visitedCells[squares[i].getXLocation()][squares[i].getYLocation()] != 1) {
+                        recursion(squares[i]);
+                    }
+                }
+            }
+        } else {
+            square.setImage("images/" + bombCount + ".png");
         }
     }
 
     @Override
     public void rightClicked() {
         this.setImage("images/flag.png");
-
     }
 
     public boolean getHasBomb() {
         return this.hasBomb;
     }
-
-    public boolean getBomb(int x, int y) {
-        return ((BombSquare) this.board.getSquareAt(x, y)).getHasBomb();
-    }
-
-    public void recursion(int x, int y) {
-        int bombCount = 0;
-
-        boolean bombsArray[] = new boolean[9];
-
-        bombsArray[0] = getBomb(x - 1, y - 1);
-        bombsArray[1] = getBomb(x - 1, y);
-        bombsArray[2] = getBomb(x - 1, y + 1);
-        bombsArray[3] = getBomb(x, y + 1);
-        bombsArray[4] = getBomb(x, y - 1);
-        bombsArray[5] = getBomb(x + 1, y - 1);
-        bombsArray[6] = getBomb(x + 1, y);
-        bombsArray[7] = getBomb(x + 1, y + 1);
-        bombsArray[8] = getBomb(x, y);
-
-        for (int i = 0; i < bombsArray.length; i++) {
-            if (bombsArray[i]) {
-                bombCount++;
-            }
-        }
-
-        switch (bombCount) {
-            case 0:
-                this.setImage("images/0.png");
-                break;
-            case 1:
-                this.setImage("images/1.png");
-                break;
-            case 2:
-                this.setImage("images/2.png");
-                break;
-            case 3:
-                this.setImage("images/3.png");
-                break;
-            case 4:
-                this.setImage("images/4.png");
-                break;
-            case 5:
-                this.setImage("images/5.png");
-                break;
-            case 6:
-                this.setImage("images/6.png");
-                break;
-            case 7:
-                this.setImage("images/7.png");
-                break;
-            case 8:
-                this.setImage("images/8.png");
-                break;
-            case 9:
-                this.setImage("images/9.png");
-                break;
-
-        }
-    }
-
 }
