@@ -4,9 +4,10 @@ import java.util.List;
 public class BombSquare extends GameSquare {
 
     private GameBoard board; // Object reference to the GameBoard this square is part of.
-    private boolean hasBomb; // State if a square has a bomb or not.
-    private boolean visited; // State if a square was visited or not.
-    private boolean flag; // State if a square has a flag on or not.
+    private boolean hasBomb; // State whether square has a bomb or not.
+    private boolean visited; // State whether square was visited or not.
+    private boolean flag; // State whether square has a flag on or not.
+    private boolean gameEnd; // State whether game has ended.
 
     public static final int MINE_PROBABILITY = 10;
 
@@ -24,6 +25,7 @@ public class BombSquare extends GameSquare {
         this.hasBomb = ((int) (Math.random() * MINE_PROBABILITY)) == 0;
         this.visited = false;
         this.flag = false;
+        this.gameEnd = false;
     }
 
     /**
@@ -32,12 +34,36 @@ public class BombSquare extends GameSquare {
      */
     @Override
     public void leftClicked() {
-        if (this.hasBomb) {
-            this.setImage("images/bomb.png");
-            System.out.println("Game End");
-        } else {
-            displaySquares(this);
+
+        if (!this.gameEnd) {
+
+            if (this.hasBomb) {
+                System.out.println("Game End");
+                gameEnd();
+
+                int i = 0, j = 0;
+                while (this.board.getSquareAt(i, j) != null) {
+                    while (this.board.getSquareAt(i, j) != null) {
+
+                        BombSquare bombSquare = ((BombSquare) this.board.getSquareAt(i, j));
+
+                        if (!bombSquare.getVisited()) {
+                            if (bombSquare.getHasBomb()) {
+                                this.board.getSquareAt(i, j).setImage("images/bomb.png");
+                            } else {
+                                this.board.getSquareAt(i, j).setImage("images/blank.png");
+                            }
+                        }
+                        j++;
+                    }
+                    i++;
+                    j = 0;
+                }
+            } else {
+                displaySquares(this);
+            }
         }
+
     }
 
     /**
@@ -94,16 +120,20 @@ public class BombSquare extends GameSquare {
     @Override
     public void rightClicked() {
 
-        boolean visited = this.getVisited();
-        boolean flag = this.getFlag();
+        if (!this.gameEnd) {
 
-        if (!visited && !flag) {
-            setImage("images/flag.png");
-            this.setFlag(true);
-        } else if (!visited && flag) {
-            setImage("images/blank.png");
-            this.setFlag(false);
+            boolean visited = this.getVisited();
+            boolean flag = this.getFlag();
+
+            if (!visited && !flag) {
+                this.setImage("images/flag.png");
+                this.setFlag(true);
+            } else if (!visited && flag) {
+                this.setImage("images/blank.png");
+                this.setFlag(false);
+            }
         }
+
     }
 
     /**
@@ -136,6 +166,49 @@ public class BombSquare extends GameSquare {
      */
     public void setFlag(boolean flag) {
         this.flag = flag;
+    }
+
+    /**
+     * 
+     * @return if the square has a bomb or not.
+     */
+    public boolean getHasBomb() {
+        return this.hasBomb;
+    }
+
+    /**
+     * 
+     * @param gameEnd sets the state of the game end on the square.
+     */
+    public void setGameEnd(boolean gameEnd) {
+        this.gameEnd = gameEnd;
+    }
+
+    /**
+     * 
+     * @return if the game has ended or not.
+     */
+    public boolean getGameEnd() {
+        return this.gameEnd;
+    }
+
+    /**
+     * Sets the game end to all squares on the board.
+     */
+    public void gameEnd() {
+
+        int i = 0, j = 0;
+        while (this.board.getSquareAt(i, j) != null) {
+            while (this.board.getSquareAt(i, j) != null) {
+
+                BombSquare bombSquare = ((BombSquare) this.board.getSquareAt(i, j));
+
+                bombSquare.setGameEnd(true);
+                j++;
+            }
+            i++;
+            j = 0;
+        }
     }
 
 }
