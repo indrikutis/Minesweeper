@@ -30,7 +30,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * Initiated by the left mouse click. Sets the image of the game square: empty,
-     * bomb, or a number of surrounding bombs in surrounding game squares.
+     * bomb, or a number of bombs in surrounding game squares.
      */
     @Override
     public void leftClicked() {
@@ -41,6 +41,7 @@ public class BombSquare extends GameSquare {
                 System.out.println("Game End");
                 gameEnd();
 
+                // Reveals all bombs.
                 int i = 0, j = 0;
                 while (this.board.getSquareAt(i, j) != null) {
                     while (this.board.getSquareAt(i, j) != null) {
@@ -49,9 +50,9 @@ public class BombSquare extends GameSquare {
 
                         if (!bombSquare.getVisited()) {
                             if (bombSquare.getHasBomb()) {
-                                this.board.getSquareAt(i, j).setImage("images/bomb.png");
+                                bombSquare.setImage("images/bomb.png");
                             } else {
-                                this.board.getSquareAt(i, j).setImage("images/blank.png");
+                                bombSquare.setImage("images/blank.png");
                             }
                         }
                         j++;
@@ -63,7 +64,6 @@ public class BombSquare extends GameSquare {
                 displaySquares(this);
             }
         }
-
     }
 
     /**
@@ -78,9 +78,9 @@ public class BombSquare extends GameSquare {
 
         ((BombSquare) square).setVisited(true);
 
+        // Surrounding squares.
         GameSquare squares[] = new BombSquare[9];
 
-        // Surrounding game squares.
         squares[0] = this.board.getSquareAt(x, y);
         squares[1] = this.board.getSquareAt(x - 1, y - 1);
         squares[2] = this.board.getSquareAt(x - 1, y);
@@ -98,7 +98,7 @@ public class BombSquare extends GameSquare {
             }
         }
 
-        // Checks the surrounding game squares of an empty game square.
+        // Checks the surrounding game squares.
         if (bombCount == 0) {
             square.setImage("images/0.png");
             for (int i = 0; i < squares.length; i++) {
@@ -138,7 +138,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * 
-     * @return if the square was visited or not.
+     * @return if the square was visited.
      */
     public boolean getVisited() {
         return this.visited;
@@ -146,7 +146,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * 
-     * @param visited sets the state if the square was visited or not.
+     * @param visited sets the state if the square was visited.
      */
     public void setVisited(boolean visited) {
         this.visited = visited;
@@ -154,7 +154,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * 
-     * @return if the square has a flag on or not.
+     * @return if the square has a flag on.
      */
     public boolean getFlag() {
         return this.flag;
@@ -162,7 +162,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * 
-     * @param flag sets the state if the square has a flag on or not.
+     * @param flag sets the state if the square has a flag on.
      */
     public void setFlag(boolean flag) {
         this.flag = flag;
@@ -170,7 +170,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * 
-     * @return if the square has a bomb or not.
+     * @return if the square has a bomb.
      */
     public boolean getHasBomb() {
         return this.hasBomb;
@@ -178,7 +178,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * 
-     * @param gameEnd sets the state of the game end on the square.
+     * @param gameEnd sets the state of the game on the square.
      */
     public void setGameEnd(boolean gameEnd) {
         this.gameEnd = gameEnd;
@@ -186,7 +186,7 @@ public class BombSquare extends GameSquare {
 
     /**
      * 
-     * @return if the game has ended or not.
+     * @return the sate of the game.
      */
     public boolean getGameEnd() {
         return this.gameEnd;
@@ -210,5 +210,4 @@ public class BombSquare extends GameSquare {
             j = 0;
         }
     }
-
 }
